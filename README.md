@@ -30,8 +30,7 @@ Source .zslot in your .zshrc.
 
 ## Licence
 
-* NYSL (http://www.kmonos.net/nysl/)
-* Official : TBD.
+* NYSL (http://www.kmonos.net/nysl/) 0.9981
 
 ## Others
 
