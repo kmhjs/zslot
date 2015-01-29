@@ -32,3 +32,7 @@ Source .zslot in your .zshrc.
 
 * NYSL (http://www.kmonos.net/nysl/)
 * Official : TBD.
+
+## Others
+
+This project was moved from my [gist](https://gist.github.com/kmhjs/7c2de0cbbd13f7ce8d43).
