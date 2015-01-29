@@ -1,0 +1,2 @@
+export ZUSER_SLOT_FILE_NAME=$HOME/.zslot_info
+export ZUSER_SLOT_MAX_SLOT_ID=8
