@@ -92,7 +92,18 @@ function zslot()
 
         [ -x "`which realpath`" -a -x "`which base64`" ] && {
             # If dest is not absolute path, convert
-            [[ $d_dest[1] != '/' ]] && d_dest=$(realpath $1)
+            [[ $d_dest[1] != '/' && $#d_dest > 0 ]] && {
+                d_dest=$(realpath $1)
+            } || {
+                echo "[Error] zslot-push : Destination is not specified"
+                return
+            }
+
+            # If slot id contains invalid value, skip
+            [ ! -z "$(echo $slot_id | grep '[^0-9]')" ] && {
+                echo "[Error] zslot-push : Invalid slot ID has been detected"
+                return
+            }
 
             [[ $slot_id -le $ZUSER_SLOT_MAX_SLOT_ID && $slot_id -ge 1 ]] && {
                 [ -d $d_dest ] && {
