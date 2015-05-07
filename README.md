@@ -22,7 +22,7 @@ This plugin contains following options.
 ## Installation
 
 Add some lines to your .zshenv from .zshenv of this project.
-Source .zslot in your .zshrc.
+Add some lines to your .zshrc from .zshrc of this project.
 
 ## Todo
 
