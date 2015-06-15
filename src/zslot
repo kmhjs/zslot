@@ -4,8 +4,8 @@ function zslot()
 {
     function __zslot_gnu_base64_decode_opt()
     {
-        [ -x "`which base64`" ] && {
-            [ -n "$(base64 --version | grep 'GNU')" ] && {
+        [[ -x $(which base64) ]] && {
+            [[ -n "$(base64 --version | grep 'GNU')" ]] && {
                 echo '-d'
             } || {
                 echo '-D'
@@ -33,13 +33,13 @@ function zslot()
     {
         local sid d_path s d_path_b64
 
-        [ -x "`which base64`" ] && {
-            cat $ZUSER_SLOT_FILE_NAME | while read s; do
+        [[ -x $(which base64) ]] && {
+            cat ${ZUSER_SLOT_FILE_NAME} | while read s; do
                 sid=$(echo $s | cut -d ' ' -f 1)
                 d_dest_b64=$(echo $(echo $s | sed 's/^[0-9]*/ /g' | tr -d ' '))
 
-                [ $#d_dest_b64 != 0 ] && {
-                    d_path=$(echo $d_dest_b64 | base64 $(__zslot_gnu_base64_decode_opt))
+                [[ ${#d_dest_b64} != 0 ]] && {
+                    d_path=$(echo ${d_dest_b64} | base64 $(__zslot_gnu_base64_decode_opt))
                 } || {
                     d_path=""
                 }
@@ -57,9 +57,9 @@ function zslot()
         dest_id=$1
 
         [[ $dest_id -le $ZUSER_SLOT_MAX_SLOT_ID && $dest_id -ge 1 ]] && {
-            cat $ZUSER_SLOT_FILE_NAME | grep -v "^${dest_id}" >  /tmp/zslottmp
-            echo ${dest_id}                                   >> /tmp/zslottmp
-            cat /tmp/zslottmp | sort -n                       >  $ZUSER_SLOT_FILE_NAME
+            cat ${ZUSER_SLOT_FILE_NAME} | grep -v "^${dest_id}" >  /tmp/zslottmp
+            echo ${dest_id}                                     >> /tmp/zslottmp
+            cat /tmp/zslottmp | sort -n                         >  $ZUSER_SLOT_FILE_NAME
 
             rm -f /tmp/zslottmp
         } || {
@@ -69,12 +69,13 @@ function zslot()
 
     function __zslot_move_slot()
     {
-        [ -x "`which base64`" ] && {
-        local d_path d_path_b64
-            d_path_b64=$(echo $(cat $ZUSER_SLOT_FILE_NAME | grep "^${1}" | cut -d' ' -f2))
-            d_path=$(echo $d_path_b64 | base64 $(__zslot_gnu_base64_decode_opt))
+        [[ -x $(which base64) ]] && {
+            local d_path d_path_b64
 
-            [[ -d $d_path && -n "${d_path}" ]] && {
+            d_path_b64=$(echo $(cat ${ZUSER_SLOT_FILE_NAME} | grep "^${1}" | cut -d' ' -f2))
+            d_path=$(echo ${d_path_b64} | base64 $(__zslot_gnu_base64_decode_opt))
+
+            [[ -d ${d_path} && -n "${d_path}" ]] && {
                 cd $d_path
             } || {
                 echo "[Error] : Directory (${d_path}) not found"
@@ -90,9 +91,9 @@ function zslot()
         d_dest=$1
         slot_id=$2
 
-        [ -x "`which realpath`" -a -x "`which base64`" ] && {
+        [[ -x $(which realpath) && -x $(which base64) ] && {
             # If dest is not absolute path, convert
-            [[ $d_dest[1] != '/' && $#d_dest > 0 ]] && {
+            [[ ${d_dest[1]} != '/' && ${#d_dest} > 0 ]] && {
                 d_dest=$(realpath $1)
             } || {
                 echo "[Error] zslot-push : Destination is not specified"
@@ -100,18 +101,18 @@ function zslot()
             }
 
             # If slot id contains invalid value, skip
-            [ ! -z "$(echo $slot_id | grep '[^0-9]')" ] && {
+            [[ ! -z "$(echo $slot_id | grep '[^0-9]')" ]] && {
                 echo "[Error] zslot-push : Invalid slot ID has been detected"
                 return
             }
 
             [[ $slot_id -le $ZUSER_SLOT_MAX_SLOT_ID && $slot_id -ge 1 ]] && {
-                [ -d $d_dest ] && {
-                    [ -z "$(cat $ZUSER_SLOT_FILE_NAME | grep "^${d_dest}$")" ] && {
-                        d_dest_b64=$(echo $d_dest | base64)
-                        cat $ZUSER_SLOT_FILE_NAME | grep -v "^${slot_id}" >  /tmp/zslottmp
-                        echo "${slot_id} ${d_dest_b64}" | tr -d '\n'      >> /tmp/zslottmp
-                        cat /tmp/zslottmp | sort -n                       >  $ZUSER_SLOT_FILE_NAME
+                [[ -d ${d_dest} ]] && {
+                    [ -z "$(cat ${ZUSER_SLOT_FILE_NAME} | grep "^${d_dest}$")" ] && {
+                        d_dest_b64=$(echo ${d_dest} | base64)
+                        cat ${ZUSER_SLOT_FILE_NAME} | grep -v "^${slot_id}" >  /tmp/zslottmp
+                        echo "${slot_id} ${d_dest_b64}" | tr -d '\n'        >> /tmp/zslottmp
+                        cat /tmp/zslottmp | sort -n                         >  $ZUSER_SLOT_FILE_NAME
                         rm -f /tmp/zslottmp
                     } || {
                         echo "[Info] : Already registered. Skip."
