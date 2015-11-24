@@ -91,7 +91,7 @@ function zslot()
         d_dest=$1
         slot_id=$2
 
-        [[ -x $(which realpath) && -x $(which base64) ] && {
+        [[ -x $(which realpath) && -x $(which base64) ]] && {
             # If dest is not absolute path, convert
             [[ ${d_dest[1]} != '/' && ${#d_dest} > 0 ]] && {
                 d_dest=$(realpath $1)
