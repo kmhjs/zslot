@@ -4,8 +4,13 @@ function zslot()
 {
     function __zslot_gnu_base64_decode_opt()
     {
+<<<<<<< Updated upstream
         [[ -x $(which base64) ]] && {
             [[ -n "$(base64 --version | grep 'GNU')" ]] && {
+=======
+        [ -x "`which base64`" ] && {
+            [ -n "$(base64 --version 2>/dev/null | grep 'GNU')" ] && {
+>>>>>>> Stashed changes
                 echo '-d'
             } || {
                 echo '-D'
