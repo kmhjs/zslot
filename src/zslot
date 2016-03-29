@@ -67,10 +67,24 @@ function _zslot::validate_args() {
     return 0
 }
 
+function _zslot::is_name_registered() {
+    local name=${1}
+    local record=$(hash -d | egrep "^${name}=.*$")
+
+    if [[ -n ${record} ]]; then;
+        return 0
+    ; fi
+
+    return 1
+}
+
 function _zslot::add() {
     local name=${1} dest=${2}
 
-    # TODO: If name has been registered, ask user, and continue (or not).
+    _zslot::is_name_registered ${name}
+    if [[ ${?} == 0 ]]; then;
+        # TODO: Confirm overwrite or not.
+    ; fi
 
     # TODO: Check path is exist or not.
 
