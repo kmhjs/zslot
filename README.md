@@ -27,6 +27,9 @@ Add some lines to your .zshrc from .zshrc of this project.
 ## Todo
 
 * To support Zsh autoload
+* __HIGH__ : Use named directory
+    * Reference
+        * [zshの名前付きディレクトリがとても便利 - pockestrap](http://pocke.hatenablog.com/entry/2014/07/23/173811)
 
 ## Licence
 
