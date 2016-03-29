@@ -29,10 +29,10 @@ DESCRIPTION
             ${script_name} -u [name] [new dest]
             ${script_name} --update [name] [new dest]
 
-    -d, --delete
+    -r, --remove
         USAGE:
-            ${script_name} -d [name]
-            ${script_name} --delete [name]
+            ${script_name} -r [name]
+            ${script_name} --remove [name]
 
     -s, --show
         USAGE:
@@ -51,8 +51,8 @@ function _zslot::validate_args() {
         --add
         -u
         --update
-        -d
-        --delete
+        -r
+        --remove
         -s
         --show
     )
@@ -62,7 +62,7 @@ function _zslot::validate_args() {
     ; fi
 
     local n_required_args=2
-    if [[ "${task}" == '-d' || "${task}" == '--delete' ]]; then
+    if [[ "${task}" == '-r' || "${task}" == '--remove' ]]; then
         n_required_args=1
     ; fi
     if [[ "${task}" == '-s' || "${task}" == '--show' ]]; then;
@@ -125,7 +125,7 @@ function _zslot::update() {
     return ${?}
 }
 
-function _zslot::delete() {
+function _zslot::remove() {
     local name=${1}
 
     unhash -d ${name}
@@ -160,8 +160,8 @@ function _zslot()
             _zslot::update ${args}
             return ${?}
             ;;
-        -d|--delete)
-            _zslot::delete ${args}
+        -r|--remove)
+            _zslot::remove ${args}
             return ${?}
             ;;
         -s|--show)
