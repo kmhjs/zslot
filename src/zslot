@@ -1,167 +1,125 @@
+#! /usr/bin/env zsh -f
+
 # Licence : NYSL (http://www.kmonos.net/nysl/)
 
-function zslot()
-{
-    function __zslot_gnu_base64_decode_opt()
-    {
-        [[ -x $(which base64) ]] && {
-            [[ -n "$(base64 --version 2>/dev/null | grep 'GNU')" ]] && {
-                echo '-d'
-            } || {
-                echo '-D'
-            }
-        }
-    }
+setopt CDABLE_VARS
 
-    function __zslot_show_help()
-    {
-        echo "----------:("
-        echo ""
-        echo "-> zslot help"
-        echo ""
-        echo "    -s/--show   : Show current slot information / zslot -s"
-        echo "    -p/--push   : Push target directory to slot / zslot -p <dir> <#slot>"
-        echo "    -r/--remove : Remove record from slot       / zslot -r <#slot>"
-        echo "    -m/--move   : Move to registered path       / zslot -m <#slot>"
-        echo "    -i/--init   : Initialize configuration file / zslot -i"
-        echo "    -h/--help   : Hi. It's me:)"
-        echo ""
-        echo "----------:)"
-    }
+script_name=$0
 
-    function __zslot_show_slot()
-    {
-        local sid d_path s d_path_b64
+function _zslot::help() {
+cat <<EOS
+NAME
+    ${script_name} - named directory wrapper
 
-        [[ -x $(which base64) ]] && {
-            cat ${ZUSER_SLOT_FILE_NAME} | while read s; do
-                sid=$(echo $s | cut -d ' ' -f 1)
-                d_dest_b64=$(echo $(echo $s | sed 's/^[0-9]*/ /g' | tr -d ' '))
+SYNOPSIS
+    ${script_name} [options] [name] [path]
 
-                [[ ${#d_dest_b64} != 0 ]] && {
-                    d_path=$(echo ${d_dest_b64} | base64 $(__zslot_gnu_base64_decode_opt))
-                } || {
-                    d_path=""
-                }
+DESCRIPTION
+    Wrap named directory system in zsh.
 
-                echo "- ${sid} : ${d_path}"
-            ; done
-        } || {
-            echo "[Error] : Command - base64 - not found"
-        }
-    }
+    Following options (and parameters) are available:
 
-    function __zslot_remove_slot()
-    {
-        local dest_id
-        dest_id=$1
+    -a, --add
+        USAGE:
+            ${script_name} -a [name] [path]
+            ${script_name} --add [name] [path]
 
-        [[ $dest_id -le $ZUSER_SLOT_MAX_SLOT_ID && $dest_id -ge 1 ]] && {
-            cat ${ZUSER_SLOT_FILE_NAME} | grep -v "^${dest_id}" >  /tmp/zslottmp
-            echo ${dest_id}                                     >> /tmp/zslottmp
-            cat /tmp/zslottmp | sort -n                         >  $ZUSER_SLOT_FILE_NAME
+    -u, --update
+        USAGE:
+            ${script_name} -u [old name] [new name]
+            ${script_name} --update [old name] [new name]
 
-            rm -f /tmp/zslottmp
-        } || {
-            echo "[Error] : Remove failed"
-        }
-    }
-
-    function __zslot_move_slot()
-    {
-        [[ -x $(which base64) ]] && {
-            local d_path d_path_b64
-
-            d_path_b64=$(echo $(cat ${ZUSER_SLOT_FILE_NAME} | grep "^${1}" | cut -d' ' -f2))
-            d_path=$(echo ${d_path_b64} | base64 $(__zslot_gnu_base64_decode_opt))
-
-            [[ -d ${d_path} && -n "${d_path}" ]] && {
-                cd $d_path
-            } || {
-                echo "[Error] : Directory (${d_path}) not found"
-            }
-        } || {
-            echo "[Error] : Command - base64 - not found"
-        }
-    }
-
-    function __zslot_push_slot()
-    {
-        local d_dest slot_id d_dest_b64
-        d_dest=$1
-        slot_id=$2
-
-        [[ -x $(which realpath) && -x $(which base64) ]] && {
-            # If dest is not absolute path, convert
-            [[ ${d_dest[1]} != '/' && ${#d_dest} > 0 ]] && {
-                d_dest=$(realpath $1)
-            } || {
-                echo "[Error] zslot-push : Destination is not specified"
-                return
-            }
-
-            # If slot id contains invalid value, skip
-            [[ ! -z "$(echo $slot_id | grep '[^0-9]')" ]] && {
-                echo "[Error] zslot-push : Invalid slot ID has been detected"
-                return
-            }
-
-            [[ $slot_id -le $ZUSER_SLOT_MAX_SLOT_ID && $slot_id -ge 1 ]] && {
-                [[ -d ${d_dest} ]] && {
-                    [ -z "$(cat ${ZUSER_SLOT_FILE_NAME} | grep "^${d_dest}$")" ] && {
-                        d_dest_b64=$(echo ${d_dest} | base64)
-                        cat ${ZUSER_SLOT_FILE_NAME} | grep -v "^${slot_id}" >  /tmp/zslottmp
-                        echo "${slot_id} ${d_dest_b64}" | tr -d '\n'        >> /tmp/zslottmp
-                        cat /tmp/zslottmp | sort -n                         >  $ZUSER_SLOT_FILE_NAME
-                        rm -f /tmp/zslottmp
-                    } || {
-                        echo "[Info] : Already registered. Skip."
-                    }
-                } || {
-                    echo "[Error] : Directory not found"
-                }
-            } || {
-                echo "[Error] : Slot out of bounds error"
-            }
-        } || {
-            echo "[Error] : Command - realpath - or - base64 - not found"
-        }
-    }
-
-    function __zslot_init_slot()
-    {
-        seq $ZUSER_SLOT_MAX_SLOT_ID > $ZUSER_SLOT_FILE_NAME
-    }
-
-    # Main codes
-    local mode
-    mode=$1
-
-    [[ $mode != "" ]] && {
-        case $mode in
-            -s|--show)
-                __zslot_show_slot;
-                ;;
-            -p|--push)
-                __zslot_push_slot $2 $3;
-                ;;
-            -r|--remove)
-                __zslot_remove_slot $2;
-                ;;
-            -m|--move)
-                __zslot_move_slot $2;
-                ;;
-            -i|--init)
-                __zslot_init_slot;
-                ;;
-            -h|--help)
-                __zslot_show_help;
-                ;;
-            *)
-                __zslot_move_slot $1;
-                ;;
-        esac
-    } || {
-        __zslot_show_help;
-    }
+    -d, --delete
+        USAGE:
+            ${script_name} -d [name]
+            ${script_name} --delete [name]
+EOS
 }
+
+function _zslot::validate_args() {
+    local args=${*}
+    local task=args[0]
+    shift args
+
+    local valid_tasks=(
+        -a
+        --add
+        -u
+        --update
+        -d
+        --delete
+    )
+    if [[ "${valid_tasks[(r)${task}]}" != "${task}" ]]; then;
+        echo "[ERROR] Invalid task (${task}) was given" 1>&2
+        return 1
+    ; fi
+
+    local n_required_args=2
+    if [[ "${task}" == '-d' || "${task}" == '--delete' ]]; then
+        n_required_args=1
+    ; fi
+
+    if [[ ${#args} != ${n_required_args} ]]; then;
+        echo "[ERROR] Task ${task} requires ${n_required_args} of args" 1>&2
+        return 1
+    ; fi
+
+    return 0
+}
+
+function _zslot::add() {
+    local name=${1} dest=${2}
+
+    # TODO: If name has been registered, ask user, and continue (or not).
+
+    # TODO: Check path is exist or not.
+
+    hash -d ${name}=${dest}
+    return ${?}
+}
+
+function _zslot::update() {
+    local old_name=${1} new_name=${2}
+}
+
+function _zslot::delete() {
+    local name=${1}
+}
+
+function _zslot()
+{
+    local args=${*}
+    local res=0
+
+    _zslot::validate_args ${args}
+    res=${?}
+    if [[ ${res} != 0 ]]; then;
+        _zslot::help
+        return ${res}
+    ; fi
+
+    local args=${*}
+    local task=args[0]
+    shift args
+    case ${task} in
+        -a|--add)
+            _zslot::add ${args}
+            return ${?}
+            ;;
+        -u|--update)
+            _zslot::update ${args}
+            return ${?}
+            ;;
+        -d|--delete)
+            _zslot::delete ${args}
+            return ${?}
+            ;;
+    esac
+
+    echo '[ERROR] Unknown error was occurred. Plase report in Github.' 1>&2
+    return 1
+}
+
+_zslot $*
+
+unset script_name
