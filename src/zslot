@@ -35,10 +35,17 @@ DESCRIPTION
             ${script_name} --remove [name]
 
     -s, --show
-        USAGE:
+        usage:
             ${script_name} -s
             ${script_name} --show
+
+    -h, --help
+        usage:
+            ${script_name} -h
+            ${script_name} --help
 EOS
+
+    return 0
 }
 
 function _zslot::validate_args() {
@@ -55,6 +62,8 @@ function _zslot::validate_args() {
         --remove
         -s
         --show
+        -h
+        --help
     )
     if [[ "${valid_tasks[(r)${task}]}" != "${task}" ]]; then;
         echo "[ERROR] Invalid task (${task}) was given" 1>&2
@@ -62,10 +71,14 @@ function _zslot::validate_args() {
     ; fi
 
     local n_required_args=2
+    # TODO: Change following codes to hash based implementation.
     if [[ "${task}" == '-r' || "${task}" == '--remove' ]]; then
         n_required_args=1
     ; fi
     if [[ "${task}" == '-s' || "${task}" == '--show' ]]; then;
+        n_required_args=0
+    ; fi
+    if [[ "${task}" == '-h' || "${task}" == '--help' ]]; then;
         n_required_args=0
     ; fi
 
@@ -166,6 +179,10 @@ function _zslot()
             ;;
         -s|--show)
             _zslot::show
+            return ${?}
+            ;;
+        -h|--help)
+            _zslot::help
             return ${?}
             ;;
     esac
