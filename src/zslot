@@ -26,8 +26,8 @@ DESCRIPTION
 
     -u, --update
         USAGE:
-            ${script_name} -u [old name] [new name]
-            ${script_name} --update [old name] [new name]
+            ${script_name} -u [name] [new dest]
+            ${script_name} --update [name] [new dest]
 
     -d, --delete
         USAGE:
@@ -37,8 +37,8 @@ EOS
 }
 
 function _zslot::validate_args() {
-    local args=${*}
-    local task=args[0]
+    local args=(${*})
+    local task=${args[1]}
     shift args
 
     local valid_tasks=(
@@ -78,31 +78,53 @@ function _zslot::is_name_registered() {
     return 1
 }
 
+function _zslot::confirm() {
+    local question=${1}
+
+    echo -n "${question} [y/N] : "
+    local ans=n
+    read -q ans
+    return ${?}
+}
+
 function _zslot::add() {
     local name=${1} dest=${2}
 
     _zslot::is_name_registered ${name}
     if [[ ${?} == 0 ]]; then;
-        # TODO: Confirm overwrite or not.
+        _zslot::confirm "Overwrite path for name (${name})? [y/N] : "
+        if [[ ${?} == 1 ]]; then;
+            return 1
+        ; fi
     ; fi
 
-    # TODO: Check path is exist or not.
+    _zslot::update ${name} ${dest}
+
+    return ${?}
+}
+
+function _zslot::update() {
+    local name=${1} dest=${2}
+
+    if [[ ! -e ${dest} ]]; then;
+        echo "[ERROR] Destination path (${dest}) not found." 1>&2
+        return 1
+    ; fi
 
     hash -d ${name}=${dest}
     return ${?}
 }
 
-function _zslot::update() {
-    local old_name=${1} new_name=${2}
-}
-
 function _zslot::delete() {
     local name=${1}
+
+    unhash -d ${name}
+    return ${?}
 }
 
 function _zslot()
 {
-    local args=${*}
+    local args=(${*})
     local res=0
 
     _zslot::validate_args ${args}
@@ -112,8 +134,7 @@ function _zslot()
         return ${res}
     ; fi
 
-    local args=${*}
-    local task=args[0]
+    local task=${args[1]}
     shift args
     case ${task} in
         -a|--add)
