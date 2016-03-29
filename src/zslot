@@ -33,6 +33,11 @@ DESCRIPTION
         USAGE:
             ${script_name} -d [name]
             ${script_name} --delete [name]
+
+    -s, --show
+        USAGE:
+            ${script_name} -s
+            ${script_name} --show
 EOS
 }
 
@@ -48,6 +53,8 @@ function _zslot::validate_args() {
         --update
         -d
         --delete
+        -s
+        --show
     )
     if [[ "${valid_tasks[(r)${task}]}" != "${task}" ]]; then;
         echo "[ERROR] Invalid task (${task}) was given" 1>&2
@@ -57,6 +64,9 @@ function _zslot::validate_args() {
     local n_required_args=2
     if [[ "${task}" == '-d' || "${task}" == '--delete' ]]; then
         n_required_args=1
+    ; fi
+    if [[ "${task}" == '-s' || "${task}" == '--show' ]]; then;
+        n_required_args=0
     ; fi
 
     if [[ ${#args} != ${n_required_args} ]]; then;
@@ -122,6 +132,11 @@ function _zslot::delete() {
     return ${?}
 }
 
+function _zslot::show() {
+    hash -d | sed 's/=/ => /'
+    return ${?}
+}
+
 function _zslot()
 {
     local args=(${*})
@@ -147,6 +162,10 @@ function _zslot()
             ;;
         -d|--delete)
             _zslot::delete ${args}
+            return ${?}
+            ;;
+        -s|--show)
+            _zslot::show
             return ${?}
             ;;
     esac
