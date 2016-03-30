@@ -1,8 +1,6 @@
 #! /usr/bin/env zsh -f
 
-# Licence : NYSL (http://www.kmonos.net/nysl/)
-
-script_name=$0
+script_name=${0}
 
 function _zslot::help() {
 cat <<EOS
