@@ -40,12 +40,12 @@ If you want to omit `~` when you open directory with `cd`, enable option `CDABLE
         zslot --remove [name]
 
 -s, --show
-    usage:
+    USAGE:
         zslot -s
         zslot --show
 
 -h, --help
-    usage:
+    USAGE:
         zslot -h
         zslot --help
 ```
