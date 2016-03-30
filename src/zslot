@@ -92,7 +92,7 @@ function _zslot::validate_args() {
 
 function _zslot::is_name_registered() {
     local name=${1}
-    local record=$(hash -d | egrep "^${name}=.*$")
+    local record=$(cat ${ZUSER_SLOT_FILE_NAME} | egrep "^hash -d ${name}=.*$")
 
     if [[ -n ${record} ]]; then;
         return 0
@@ -110,42 +110,84 @@ function _zslot::confirm() {
     return ${?}
 }
 
-function _zslot::add() {
-    local name=${1} dest=${2}
-
-    _zslot::is_name_registered ${name}
-    if [[ ${?} == 0 ]]; then;
-        _zslot::confirm "Overwrite path for name (${name})? [y/N] : "
-        if [[ ${?} == 1 ]]; then;
-            return 1
-        ; fi
-    ; fi
-
-    _zslot::update ${name} ${dest}
-
-    return ${?}
-}
-
-function _zslot::update() {
-    local name=${1} dest=${2}
-
-    if [[ ! -e ${dest} ]]; then;
-        echo "[ERROR] Destination path (${dest}) not found." 1>&2
+function _zslot::is_slot_record_path_defined() {
+    if [[ -z ${ZUSER_SLOT_FILE_NAME} ]]; then;
+        echo '[ERROR] Slot record file is not defined.' 1>&2
         return 1
     ; fi
 
-    hash -d ${name}=${dest}
+    return 0
+}
+
+function _zslot::slot_record_path_prepare() {
+    touch ${ZUSER_SLOT_FILE_NAME}
     return ${?}
 }
 
-function _zslot::remove() {
+function _zslot::record::add() {
+    local name=${1} dest=${2}
+
+    echo "hash -d ${name}=${dest}" >> ${ZUSER_SLOT_FILE_NAME}
+    hash -d ${name}=${dest}
+
+    return ${?}
+}
+
+function _zslot::record::remove() {
     local name=${1}
 
+    sed -e "/^hash -d ${name}=.*$/d" -i '' ${ZUSER_SLOT_FILE_NAME}
     unhash -d ${name}
+
     return ${?}
 }
 
-function _zslot::show() {
+function _zslot::cmd::add() {
+    local name=${1} dest=${2}
+
+    _zslot::is_name_registered ${name}
+    if [[ ${?} != 0 ]]; then;
+        _zslot::cmd::update ${name} ${dest} add_mode
+        return ${?}
+    ; fi
+
+    _zslot::confirm "Overwrite path for name (${name})?"
+    if [[ ${?} == 1 ]]; then;
+        return 1
+    ; fi
+    _zslot::cmd::update ${name} ${dest}
+    return ${?}
+}
+
+function _zslot::cmd::update() {
+    local name=${1} dest=${2} is_add=${3}
+
+    if [[ ! -e ${dest} ]]; then;
+        echo "[ERROR] Destination path (${dest}) is not found." 1>&2
+        return 1
+    ; fi
+
+    if [[ -z ${is_add} ]]; then;
+        _zslot::record::remove ${name}
+    ; fi
+    _zslot::record::add ${name} ${dest}
+
+    return ${?}
+}
+
+function _zslot::cmd::remove() {
+    local name=${1}
+
+    _zslot::record::remove ${name}
+    return ${?}
+}
+
+function _zslot::cmd::help() {
+    _zslot::help
+    return ${?}
+}
+
+function _zslot::cmd::show() {
     hash -d | sed 's/=/ => /'
     return ${?}
 }
@@ -158,31 +200,48 @@ function _zslot()
     _zslot::validate_args ${args}
     res=${?}
     if [[ ${res} != 0 ]]; then;
-        _zslot::help
+        _zslot::cmd::help
         return ${res}
     ; fi
 
     local task=${args[1]}
+
+    case ${task} in
+        -a|--add|-u|--update|-r|--remove)
+            _zslot::is_slot_record_path_defined
+            res=${?}
+            if [[ ${res} != 0 ]]; then;
+                return ${res}
+            ; fi
+
+            _zslot::slot_record_path_prepare
+            res=${?}
+            if [[ ${res} != 0 ]]; then;
+                return ${res}
+            ; fi
+            ;;
+    esac
+
     shift args
     case ${task} in
         -a|--add)
-            _zslot::add ${args}
+            _zslot::cmd::add ${args}
             return ${?}
             ;;
         -u|--update)
-            _zslot::update ${args}
+            _zslot::cmd::update ${args}
             return ${?}
             ;;
         -r|--remove)
-            _zslot::remove ${args}
+            _zslot::cmd::remove ${args}
             return ${?}
             ;;
         -s|--show)
-            _zslot::show
+            _zslot::cmd::show
             return ${?}
             ;;
         -h|--help)
-            _zslot::help
+            _zslot::cmd::help
             return ${?}
             ;;
     esac
