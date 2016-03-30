@@ -186,7 +186,7 @@ function _zslot::cmd::help() {
 }
 
 function _zslot::cmd::show() {
-    hash -d | sed 's/=/ => /'
+    cat ${ZUSER_SLOT_FILE_NAME} | cut -d ' ' -f 3 | sed 's/=/ => /'
     return ${?}
 }
 
