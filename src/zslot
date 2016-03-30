@@ -52,16 +52,11 @@ function _zslot::validate_args() {
     shift args
 
     local valid_tasks=(
-        -a
-        --add
-        -u
-        --update
-        -r
-        --remove
-        -s
-        --show
-        -h
-        --help
+        -a --add
+        -u --update
+        -r --remove
+        -s --show
+        -h --help
     )
     if [[ "${valid_tasks[(r)${task}]}" != "${task}" ]]; then;
         echo "[ERROR] Invalid task (${task}) was given" 1>&2
@@ -69,16 +64,12 @@ function _zslot::validate_args() {
     ; fi
 
     local n_required_args=2
-    # TODO: Change following codes to hash based implementation.
-    if [[ "${task}" == '-r' || "${task}" == '--remove' ]]; then
-        n_required_args=1
-    ; fi
-    if [[ "${task}" == '-s' || "${task}" == '--show' ]]; then;
-        n_required_args=0
-    ; fi
-    if [[ "${task}" == '-h' || "${task}" == '--help' ]]; then;
-        n_required_args=0
-    ; fi
+
+    case ${task} in
+        -r|--remove) n_required_args=1;;
+        -s|--show) n_required_args=0;;
+        -h|--help) n_required_args=0;;
+    esac
 
     if [[ ${#args} != ${n_required_args} ]]; then;
         echo "[ERROR] Task ${task} requires ${n_required_args} of args" 1>&2
