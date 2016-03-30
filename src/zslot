@@ -2,8 +2,6 @@
 
 # Licence : NYSL (http://www.kmonos.net/nysl/)
 
-setopt CDABLE_VARS
-
 script_name=$0
 
 function _zslot::help() {
