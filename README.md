@@ -60,9 +60,9 @@ If you want to omit `~` when you open directory with `cd`, enable option `CDABLE
 
 ## Todo
 
-## Licence
+## License
 
-* NYSL (http://www.kmonos.net/nysl/) 0.9981
+* The MIT Licence (MIT). See `LICENSE`.
 
 ## Others
 
