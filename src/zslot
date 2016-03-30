@@ -31,12 +31,12 @@ DESCRIPTION
             ${script_name} --remove [name]
 
     -s, --show
-        usage:
+        USAGE:
             ${script_name} -s
             ${script_name} --show
 
     -h, --help
-        usage:
+        USAGE:
             ${script_name} -h
             ${script_name} --help
 EOS
