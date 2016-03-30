@@ -5,32 +5,60 @@ Zsh - Path slot plugin
 ## Purpose
 
 * To add a kind of "Slot" (or short cut) to your terminal.
+    * Internally, this plugin uses named directory [examples:aliasdirs - ZshWiki](http://zshwiki.org/home/examples/aliasdirs).
 * Originally, this plugin was developed for Zsh.
     * Named as "zslot"
 
 ## Usage
 
-This plugin contains following options.
+```bash
+zslot [options] [name] [path]
+```
 
-    -s/--show   : Show current slot information / zslot -s
-    -p/--push   : Push target directory to slot / zslot -p <dir> <#slot>
-    -r/--remove : Remove record from slot       / zslot -r <#slot>
-    -m/--move   : Move to registered path       / zslot -m <#slot>
-    -i/--init   : Initialize configuration file / zslot -i
-    -h/--help   : Hi. It's me:)
+After you register the record, you can open stored directory as follows. 
+```
+cd ~registered_name
+``` 
+If you want to omit `~` when you open directory with `cd`, enable option `CDABLE_VARS` in `.zshrc`.
+
+### Options
+
+```bash
+-a, --add
+    USAGE:
+        zslot -a [name] [path]
+        zslot --add [name] [path]
+
+-u, --update
+    USAGE:
+        zslot -u [name] [new dest]
+        zslot --update [name] [new dest]
+
+-r, --remove
+    USAGE:
+        zslot -r [name]
+        zslot --remove [name]
+
+-s, --show
+    usage:
+        zslot -s
+        zslot --show
+
+-h, --help
+    usage:
+        zslot -h
+        zslot --help
+```
 
 ## Installation
 
-Add some lines to your .zshenv from .zshenv of this project.
-Add some lines to your .zshrc from .zshrc of this project.
+* Add some lines to your .zshenv from .zshenv of this project.
+    * Variable `ZUSER_SLOT_FILE_NAME` defines file path of persistent store.
+* Add some lines to your .zshrc from .zshrc of this project.
+    * This file loads plugin.
+    * If you want to omit `~` when you open directory with `cd`, enable option `CDABLE_VARS`. 
 
 ## Todo
-
-* To support Zsh autoload
-* __HIGH__ : Use named directory
-    * Reference
-        * [zshの名前付きディレクトリがとても便利 - pockestrap](http://pocke.hatenablog.com/entry/2014/07/23/173811)
-    * Enable to load record file as one part of configuration file. (`source ${RECORD_FILE}`)
 
 ## Licence
 
