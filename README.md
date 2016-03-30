@@ -52,11 +52,12 @@ If you want to omit `~` when you open directory with `cd`, enable option `CDABLE
 
 ## Installation
 
-* Add some lines to your .zshenv from .zshenv of this project.
+* Add some lines to your .zshenv from `.zshenv` of this project.
     * Variable `ZUSER_SLOT_FILE_NAME` defines file path of persistent store.
-* Add some lines to your .zshrc from .zshrc of this project.
+* Add some lines to your .zshrc from `.zshrc` of this project.
     * This file loads plugin.
     * If you want to omit `~` when you open directory with `cd`, enable option `CDABLE_VARS`. 
+    * To enable persistent store, you need to `source` the file `ZUSER_SLOT_FILE_NAME`.
 
 ## Todo
 
