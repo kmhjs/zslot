@@ -3,10 +3,9 @@
 function _zslot()
 {
     _arguments \
+        '(- *)'{-a,--add}'[add current directory to slot]: :_files' \
+        '(- *)'{-u,--update}'[Update record]' \
+        '(- *)'{-r,--remove}'[Remove record]' \
         '(- *)'{-s,--show}'[Show slots]' \
-        '(- *)'{-p,--push}'[Push current directory to slot]: :_files' \
-        '(- *)'{-r,--remove}'[Remove slot with id]' \
-        '(- *)'{-m,--move}'[Move to destination]' \
-        '(- *)'{-i,--init}'[Initialize slots]' \
         '(- *)'{-h,--help}'[Show help]'
 }
