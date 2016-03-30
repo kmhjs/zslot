@@ -114,8 +114,8 @@ function _zslot::slot_record_path_prepare() {
 function _zslot::record::add() {
     local name=${1} dest=${2}
 
-    echo "hash -d ${name}=${dest}" >> ${ZUSER_SLOT_FILE_NAME}
-    hash -d ${name}=${dest}
+    echo "hash -d ${name}=${dest:a}" >> ${ZUSER_SLOT_FILE_NAME}
+    hash -d ${name}=${dest:a}
 
     return ${?}
 }
